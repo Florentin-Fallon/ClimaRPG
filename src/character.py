@@ -19,7 +19,7 @@ class Character:
 
     def __str__(self):
         return f"""{self._name} the Character enter the arena with :
-    ■ attack: {self._attack_value} 
+    ■ attack: {self._attack_value}
     ■ defense: {self._defense_value}"""
 
     def get_defense_value(self):
@@ -53,8 +53,7 @@ class Character:
             return
         roll = self._dice.roll()
         damages = self.compute_damages(roll, target)
-        print(
-            f"⚔️ {self._name} attack {target.get_name()} with {damages} damages (attack: {self._attack_value} + roll: {roll})")
+        print(f"⚔️ {self._name} attack {target.get_name()} with {damages} damages (attack: {self._attack_value} + roll: {roll})")
         target.defense(damages, self)
 
     def compute_defense(self, damages, roll, attacker):
@@ -63,8 +62,7 @@ class Character:
     def defense(self, damages, attacker: Character):
         roll = self._dice.roll()
         wounds = self.compute_defense(damages, roll, attacker)
-        print(
-            f"🛡️ {self._name} take {wounds} wounds from {attacker.get_name()} (damages: {damages} - defense: {self._defense_value} - roll: {roll})")
+        print(f"🛡️ {self._name} take {wounds} wounds from {attacker.get_name()} (damages: {damages} - defense: {self._defense_value} - roll: {roll})")
         self.decrease_health(wounds)
 
 
@@ -85,10 +83,14 @@ class Thief(Character):
         print(f"🔪 Bonus: Sneacky attack (+{target.get_defense_value()} damages)")
         return super().compute_damages(roll, target) + target.get_defense_value()
 
+class Majora(Character):
+  def compute_damages(self, roll, target: Character):
+    print(f"Bonus: if you're wearing Majora's mask, you're entitled to (+5 damages)")
+    return super().compute_damages(roll, target) + 5
 
 if __name__ == "__main__":
-    character1 = Warrior("Salim", 20, 8, 3, Dice(6))
-    character2 = Thief("Lisa", 20, 8, 3, Dice(6))
+    character1 = Warrior("Salim", 50, 8, 3, Dice(6))
+    character2 = Thief("Lisa", 50, 7, 3, Dice(6))
     print(character1)
     print(character2)
 
