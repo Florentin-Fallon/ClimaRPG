@@ -1,5 +1,6 @@
 import random
 
+
 class Dice:
     def __init__(self, faces=6):
         self._faces = faces
@@ -12,15 +13,16 @@ class Dice:
 
 
 class RiggedDice(Dice):
-    
+
     def roll(self, rigged=False):
         # if rigged:
         #     return self._faces
         # else:
         #     return super().roll()
-        
+
         return self._faces if rigged else super().roll()
-    
+
+
 if __name__ == "__main__":
     a_dice = Dice()
     print(a_dice)
