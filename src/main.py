@@ -3,6 +3,7 @@ from rendering import Raylib
 
 raylib = Raylib()
 
+
 def main():
     raylib.run()
 
