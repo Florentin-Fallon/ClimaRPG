@@ -1,8 +1,10 @@
 import engine
+from rendering import Raylib
 
+raylib = Raylib()
 
 def main():
-    engine.run()
+    raylib.run()
 
 
 if __name__ == '__main__':
