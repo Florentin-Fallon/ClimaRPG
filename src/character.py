@@ -19,8 +19,9 @@ class Character:
 
     def __str__(self):
         return f"""{self._name} the Character enter the arena with :
-    ■ attack: {self._attack_value}
-    ■ defense: {self._defense_value}"""
+    ■ hp : {self._max_hp}
+    ■ attack : {self._attack_value}
+    ■ defense : {self._defense_value}"""
 
     def get_defense_value(self):
         return self._defense_value
@@ -88,12 +89,23 @@ class Majora(Character):
     print(f"Bonus: if you're wearing Majora's mask, you're entitled to (+5 damages)")
     return super().compute_damages(roll, target) + 5
 
+list_boss = [Warrior, Mage, Thief, Majora]
+
 if __name__ == "__main__":
-    character1 = Warrior("Salim", 50, 8, 3, Dice(6))
-    character2 = Thief("Lisa", 50, 7, 3, Dice(6))
+    character1 = Majora("Salim", 50, 8, 3, Dice(6))
+    character2 = Thief("Lisa", 50, 7, 5, Dice(6))
     print(character1)
     print(character2)
+
+    character3 = Mage("Grégory", 50, 8,4, Dice(6))
+    character4 = Warrior("Geoffrey", 50, 8,5,Dice(6))
+    print(character3)
+    print(character4)
 
     while (character1.is_alive() and character2.is_alive()):
         character1.attack(character2)
         character2.attack(character1)
+
+    while (character3.is_alive() and  character4.is_alive()):
+        character3.attack(character4)
+        character4.attack(character3)
