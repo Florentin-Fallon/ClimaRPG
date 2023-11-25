@@ -1,3 +1,3 @@
 # Credits
 
-- Tileset: https://cainos.itch.io/pixel-art-top-down-basic
+- Tileset & sprites: https://anokolisa.itch.io/dungeon-crawler-pixel-art-asset-pack

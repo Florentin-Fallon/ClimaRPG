@@ -1,11 +1,7 @@
 from __future__ import annotations
 
+from pyray import *
 from dice import Dice
-
-
-class MessageManager():
-    pass
-
 
 class Character:
 
@@ -18,12 +14,23 @@ class Character:
         self._dice = dice
         self._max_mana = max_mana
         self._current_mana = max_mana
+        self._position = Vector2(0, 0)
+        self._texture = load_texture(f"res/characters/{self.get_id()}.png")
 
     def __str__(self):
         return f"""{self._name} the Character enter the arena with :
     ■ attack: {self._attack_value} 
     ■ defense: {self._defense_value}
     ■ mana : {self._current_mana}"""
+
+    def get_position(self):
+        return self._position
+
+    def get_texture(self) -> Texture:
+        return self._texture
+
+    def get_id(self):
+        return self.__class__.__name__.lower()
 
     def get_defense_value(self):
         return self._defense_value
@@ -105,7 +112,8 @@ class Mage(Character):
         if self.use_mana(spell_cost):
             roll = self._dice.roll()
             damages = self.compute_damages(roll, target)
-            print(f"🔮 {self._name} casts a spell on {target.get_name()} dealing {damages} damages (attack: {self._attack_value} + roll: {roll})")
+            print(
+                f"🔮 {self._name} casts a spell on {target.get_name()} dealing {damages} damages (attack: {self._attack_value} + roll: {roll})")
             target.defense(damages, self)
         else:
             print("not enough mana to cast the spell")
@@ -131,4 +139,3 @@ if __name__ == "__main__":
     while (character1.is_alive() and character2.is_alive()):
         character1.attack(character2)
         character2.attack(character1)
-

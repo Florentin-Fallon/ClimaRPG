@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.9" tiledversion="1.9.1" name="props" tilewidth="32" tileheight="32" tilecount="256" columns="16">
- <image source="TX Props.png" width="512" height="512"/>
+<tileset version="1.9" tiledversion="1.9.1" name="props" tilewidth="16" tileheight="16" tilecount="625" columns="25">
+ <image source="dungeon/Environment/Dungeon Prison/Assets/Props.png" width="400" height="400"/>
 </tileset>

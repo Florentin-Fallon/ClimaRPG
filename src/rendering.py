@@ -1,6 +1,7 @@
 from pyray import *
 import pytmx
 
+
 class Raylib:
 
     def __init__(self):
