@@ -9,6 +9,7 @@ from rendering import Raylib
 arena = Arena()
 raylib = Raylib()
 rend = MapRenderer(pytmx.TiledMap('res/maps/map.tmx'), 16)
+camera = Camera2D(Vector2(0, 0), Vector2(0, 0), 0, 1)
 
 
 def setup_characters():
@@ -28,12 +29,16 @@ def update():
 
 
 def render():
+    begin_mode_2d(camera)
+
     # Render the map
     rend.render()
 
     # Render the characters
     for character in arena.get_characters():
         character.render(rend.get_tile_size())
+
+    end_mode_2d()
 
 
 if __name__ == '__main__':
