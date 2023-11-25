@@ -12,8 +12,10 @@ rend = MapRenderer(pytmx.TiledMap('res/maps/map.tmx'), 16)
 
 
 def setup_characters():
-    arena.add(Mage('Frank', 20, 10, 15, Dice(2), 10))
-    arena.add(Warrior('Claude', 20, 15, 10, Dice(2), 0))
+    arena.add(Mage('Frank', 20, 10, 15, Dice(2), 10)
+              .with_position(Vector2(16, 15)))
+    arena.add(Warrior('Claude', 20, 15, 10, Dice(2), 0)
+              .with_position(Vector2(22, 15)))
 
 
 def main():
@@ -31,11 +33,7 @@ def render():
 
     # Render the characters
     for character in arena.get_characters():
-        pos = character.get_position()
-        draw_texture(character.get_texture(),
-                     int(pos.x * rend.get_tile_size()),
-                     int(pos.y * rend.get_tile_size()),
-                     WHITE)
+        character.render(rend.get_tile_size())
 
 
 if __name__ == '__main__':

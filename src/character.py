@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pyray import *
 from dice import Dice
+from texture_cache import load_cached_texture
+
 
 class Character:
 
@@ -15,7 +17,8 @@ class Character:
         self._max_mana = max_mana
         self._current_mana = max_mana
         self._position = Vector2(0, 0)
-        self._texture = load_texture(f"res/characters/{self.get_id()}.png")
+        self._texture = load_cached_texture(f"res/characters/{self.get_id()}.png")
+        self._shadow = load_cached_texture(f"res/characters/shadow.png")
 
     def __str__(self):
         return f"""{self._name} the Character enter the arena with :
@@ -77,6 +80,19 @@ class Character:
         print(
             f"🛡️ {self._name} take {wounds} wounds from {attacker.get_name()} (damages: {damages} - defense: {self._defense_value} - roll: {roll})")
         self.decrease_health(wounds)
+
+    def with_position(self, position: Vector2) -> Character:
+        self._position = position
+        return self
+
+    # Raylib specific methods
+    def render(self, tile_size: int):
+        x = int(self._position.x * tile_size)
+        y = int(self._position.y * tile_size)
+
+        draw_texture(self._shadow, x, y + 5, WHITE)
+
+        draw_texture(self._texture, x, y, WHITE)
 
 
 class Warrior(Character):
