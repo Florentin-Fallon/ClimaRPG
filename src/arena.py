@@ -21,6 +21,8 @@ class ArenaLog:
 
 class Arena:
     def __init__(self):
+        self.current_character_index = 0
+        self.current_characters = None
         self._characters: list[Character] = []
         self._logs: list[ArenaLog] = []
 
@@ -50,7 +52,12 @@ class Arena:
         self._characters[1].attack(self._characters[0])
 
     def update(self):
-        pass
+        if self.current_characters is not None:
+            self.current_characters.update_movements()
+
+        if is_key_pressed(KeyboardKey.KEY_LEFT_SHIFT) or is_key_pressed(KeyboardKey.KEY_RIGHT_SHIFT):
+            self.current_character_index = (self.current_character_index + 1) % len(self._characters)
+            self.current_characters = self._characters[self.current_character_index]
 
     def render(self):
         latest_logs = self._logs[-5:]
