@@ -17,18 +17,20 @@ def logger_callback(message, color: Color = WHITE):
 
 
 def setup_characters():
-    arena.add(Mage('Frank', 20, 10, 15, Dice(2), 10, logger_callback)
+    arena.add(Mage('Frank', 50, 10, 15, Dice(10), 10, logger_callback)
               .with_position(Vector2(16, 14)))
-    arena.add(Warrior('Claude', 20, 15, 10, Dice(2), logger_callback)
+    arena.add(Warrior('Claude', 50, 15, 10, Dice(10), logger_callback)
               .with_position(Vector2(22, 14)))
-    arena.add(Majora('Legend', 50, 25, 20, Dice(2), logger_callback)
+    arena.add(Majora('Legend', 50, 25, 20, Dice(10), logger_callback)
               .with_position(Vector2(16, 18)))
-    arena.add(Thief('Garro', 15, 9, 20, Dice(2), logger_callback)
+    arena.add(Thief('Garro', 15, 9, 20, Dice(10), logger_callback)
               .with_position(Vector2(22, 18)))
-    arena.add(Archer('Trevize', 50, 15, 20, Dice(2), logger_callback)
+    arena.add(Archer('Trevize', 50, 15, 20, Dice(10), logger_callback)
               .with_position(Vector2(16, 23)))
-    arena.add(Deadpool('Ryan', 50, 20, 20, Dice(2), logger_callback)
+    arena.add(Deadpool('Ryan', 50, 20, 20, Dice(10), logger_callback)
               .with_position(Vector2(22, 23)))
+
+    arena.start_battle()
 
 
 def main():
@@ -37,12 +39,16 @@ def main():
 
 
 def update():
+    if not arena.is_battle():
+        return
+
     for character in arena.get_characters():
         character.update()
 
     arena.update()
 
-    if arena.any_character_dead():
+    if arena.alive_count() == 1:
+        arena.end_battle()
         return
 
     if is_key_pressed(KeyboardKey.KEY_SPACE):

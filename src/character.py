@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import random
+
 from pyray import *
 from dice import Dice
 from texture_cache import load_cached_texture
@@ -19,9 +21,13 @@ class Character:
         self._texture = load_cached_texture(f"res/characters/{self.get_id()}.png")
         self._shadow = load_cached_texture(f"res/characters/shadow.png")
         self._yOffset = 0
+        self._tilt: float = 0
 
     def is_dead(self):
         return self._current_hp <= 0
+
+    def log_bonus(self, name: str):
+        self._logger(f"{self._name} used {name} !", GREEN)
 
     def get_position(self):
         return self._position
@@ -39,34 +45,39 @@ class Character:
         return self._name
 
     def is_alive(self):
-        return self._current_hp > 0
+        return not self.is_dead()
 
     def regenerate(self):
         self._current_hp = self._max_hp
 
     def decrease_health(self, amount):
         if amount <= 0:
+            self._logger(f"{self._name} had no damage", get_color(0xFF7F7FFF))
             return
 
         self._current_hp -= amount
+
+        self._logger(f"{self._name}: -{amount} HP !", get_color(0xFF7F7FFF))
+
         if self._current_hp < 0:
             self._current_hp = 0
             self._logger(f"{self._name} is dead !", RED)
 
     def compute_damages(self, roll, target):
-        return self._attack_value + roll
+        return min(1, self._attack_value * roll / 2.5)
 
     def attack(self, target: Character):
         if not self.is_alive():
             return
+
+        self._logger(f"{self._name} attacks {target.get_name()} !")
+
         roll = self._dice.roll()
         damages = self.compute_damages(roll, target)
-        self._logger(
-            f"{self._name} attacks {target.get_name()} ! -{damages} HP (attack: {self._attack_value} + roll: {roll})")
         target.defense(damages, self)
 
     def compute_defense(self, damages, roll, attacker):
-        return damages - self._defense_value - roll
+        return damages - self._defense_value // 10 - roll
 
     def defense(self, damages, attacker: Character):
         roll = self._dice.roll()
@@ -83,13 +94,17 @@ class Character:
         if self._yOffset > 10:
             self._yOffset = 0
 
+        if self.is_dead() and self._tilt < 1:
+            self._tilt += get_frame_time() * 4
+
     # Raylib specific methods
     def render(self, tile_size: int):
         x = int(self._position.x * tile_size)
         y = int(self._position.y * tile_size)
 
         draw_texture(self._shadow, x, y + 5, WHITE)
-        draw_texture(self._texture, x, y - int(self._yOffset / 5), WHITE)
+        draw_texture_ex(self._texture, Vector2(x + self._tilt * self._texture.width,
+                                               y - int(self._yOffset / 5)), self._tilt * 90, 1, WHITE)
 
         self.render_hud(x, y)
 
@@ -112,8 +127,8 @@ class Character:
 
 class Warrior(Character):
     def compute_damages(self, roll, target: Character):
-        # print("🪓 Bonus: Axe in your face (+3 attack)")
-        return super().compute_damages(roll, target) + 3
+        self.log_bonus('Axe')
+        return super().compute_damages(roll, target) + 30 * (roll / 10)
 
 
 class Mage(Character):
@@ -135,25 +150,18 @@ class Mage(Character):
         self._mana = min(self._mana, self._mana + amount)
 
     def compute_defense(self, damages, roll, attacker: Character):
-        if self.use_mana(3):
-            self._logger("Magic armor activated !", GREEN)
-            return super().compute_defense(damages, roll, attacker) - 3
+        if self.use_mana(1) and roll % 2 == 0:
+            self.log_bonus('Magic Armor')
+            return super().compute_defense(damages, roll, attacker) - 5
         else:
             return super().compute_defense(damages, roll, attacker)
 
-    def attack(self, target: Character):
-        if not self.is_alive():
-            return
-
+    def compute_damages(self, roll, target):
         if self.use_mana(5):
-            roll = self._dice.roll()
-            damages = self.compute_damages(roll, target)
-            self._logger("Mage's Spell activated !", GREEN)
-            target.defense(damages, self)
+            self.log_bonus('Magic Spell')
+            return super().compute_damages(roll, target) * 10
         else:
-            roll = self._dice.roll()
-            damages = self.compute_damages(roll, target) / 2
-            target.defense(damages, self)
+            return super().compute_damages(roll, target) / 2
 
     def render_hud(self, x: int, y: int):
         super().render_hud(x, y - 10)
@@ -165,23 +173,23 @@ class Mage(Character):
 
 class Thief(Character):
     def compute_damages(self, roll, target: Character):
-        self._logger(f"Bonus: Sneacky attack (+{target.get_defense_value()} damages)")
-        return super().compute_damages(roll, target) + target.get_defense_value()
+        self.log_bonus('Defense Steal')
+        return super().compute_damages(roll, target) + target.get_defense_value() + roll * 2
 
 
 class Majora(Character):
     def compute_damages(self, roll, target: Character):
-        self._logger(f"Bonus: if you're wearing Majora's mask, you're entitled to (+5 damages)")
-        return super().compute_damages(roll, target) + 5
+        self.log_bonus("Majora's Mask")
+        return super().compute_damages(roll, target) + 25
 
 class Archer(Character):
   def compute_damages(self, roll, target: Character):
-    self._logger("Bonus: shoots an arrow (+4 damages)")
-    return super().compute_damages(roll, target) + 4
+    self.log_bonus("Bows & Arrows")
+    return super().compute_damages(roll, target) + 5
 
 class Deadpool(Character):
   def compute_defense(self, damages, roll, attacker: Character):
-    self._logger("Bonus: shield activate (-5 damages")
-    return super().compute_defense(damages, roll, attacker) - 5
+    self.log_bonus("The Shield")
+    return super().compute_defense(damages, roll, attacker) - 15
 
 list_boss = [Warrior, Mage, Thief, Majora, Archer, Deadpool]
