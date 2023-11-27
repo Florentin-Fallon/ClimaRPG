@@ -22,12 +22,6 @@ class Character:
         self._shadow = load_cached_texture(f"res/characters/shadow.png")
         self._yOffset = 0
 
-    def __str__(self):
-        return f"""{self._name} the Character enter the arena with :
-    ■ attack: {self._attack_value} 
-    ■ defense: {self._defense_value}
-    ■ mana : {self._current_mana}"""
-
     def is_dead(self):
         return self._current_hp <= 0
 
@@ -173,13 +167,9 @@ class Thief(Character):
         self._logger(f"Bonus: Sneacky attack (+{target.get_defense_value()} damages)")
         return super().compute_damages(roll, target) + target.get_defense_value()
 
+class Majora(Character):
+  def compute_damages(self, roll, target: Character):
+    print(f"Bonus: if you're wearing Majora's mask, you're entitled to (+5 damages)")
+    return super().compute_damages(roll, target) + 5
 
-if __name__ == "__main__":
-    character1 = Warrior("Salim", 20, 0, 3, Dice(6), 0)
-    character2 = Mage("Lisa", 20, 0, 3, Dice(6), 100)
-    print(character1)
-    print(character2)
-
-    while (character1.is_alive() and character2.is_alive()):
-        character1.attack(character2)
-        character2.attack(character1)
+list_boss = [Warrior, Mage, Thief, Majora]
