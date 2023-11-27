@@ -182,4 +182,4 @@ class Deadpool(Character):
     self._logger("Bonus: shield activate (-5 damages")
     return super().compute_defense(damages, roll, attacker) - 5
 
-list_boss = [Warrior, Mage, Thief, Majora]
+list_boss = [Warrior, Mage, Thief, Majora, Archer, Deadpool]
