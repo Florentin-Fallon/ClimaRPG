@@ -97,8 +97,6 @@ class Character:
         if is_key_down(KeyboardKey.KEY_D):
             self._position.x += get_frame_time()
 
-
-
         # Raylib specific methods
     def render(self, tile_size: int):
         x = int(self._position.x * tile_size)
