@@ -7,15 +7,13 @@ from texture_cache import load_cached_texture
 
 class Character:
 
-    def __init__(self, name: str, max_hp: int, attack: int, defense: int, dice: Dice, max_mana: int, logger_callback):
+    def __init__(self, name: str, max_hp: int, attack: int, defense: int, dice: Dice, logger_callback):
         self._name = name
         self._max_hp = max_hp
         self._current_hp = max_hp
         self._attack_value = attack
         self._defense_value = defense
         self._dice = dice
-        self._max_mana = max_mana
-        self._current_mana = max_mana
         self._logger = logger_callback
         self._position = Vector2(0, 0)
         self._texture = load_cached_texture(f"res/characters/{self.get_id()}.png")
@@ -120,20 +118,25 @@ class Warrior(Character):
 
 class Mage(Character):
 
+    def __init__(self, name: str, max_hp: int, attack: int, defense: int, dice: Dice, max_mana: float, logger_callback):
+        super().__init__(name, max_hp, attack, defense, dice, logger_callback)
+
+        self._mana = max_mana
+        self._max_mana = max_mana
+
     def use_mana(self, cost: int):  # cost = coût du mana
-        if self._current_mana - cost >= 0:
-            self._current_mana -= cost
+        if self._mana - cost >= 0:
+            self._mana -= cost
             return True
         else:
-            self._logger("not enough mana !")
             return False
 
     def regain_mana(self, amount: int):
-        self._current_mana = min(self._max_mana, self._current_mana + amount)
+        self._mana = min(self._mana, self._mana + amount)
 
     def compute_defense(self, damages, roll, attacker: Character):
-        self._logger("🧙 Bonus: Magic armor (-3 damages)")
         if self.use_mana(3):
+            self._logger("Magic armor activated !", GREEN)
             return super().compute_defense(damages, roll, attacker) - 3
         else:
             return super().compute_defense(damages, roll, attacker)
@@ -141,35 +144,35 @@ class Mage(Character):
     def attack(self, target: Character):
         if not self.is_alive():
             return
-        spell_cost = 5
-        if self.use_mana(spell_cost):
+
+        if self.use_mana(5):
             roll = self._dice.roll()
             damages = self.compute_damages(roll, target)
-            self._logger(
-                f"{self._name} casts a spell on {target.get_name()} dealing {damages} damages (attack: {self._attack_value} + roll: {roll})")
+            self._logger("Mage's Spell activated !", GREEN)
             target.defense(damages, self)
         else:
-            self._logger(f"not enough mana to cast the spell ({self._current_mana} mana)")
-
-    def show_healthbar(self):
-        super().show_healthbar()
-        self._logger(f"mana = {self._current_mana}")
+            roll = self._dice.roll()
+            damages = self.compute_damages(roll, target) / 2
+            target.defense(damages, self)
 
     def render_hud(self, x: int, y: int):
         super().render_hud(x, y - 10)
 
         mana_bar_y = y
-        mana_percent = self._current_mana / self._max_mana
+        mana_percent = self._mana / self._max_mana
         self.render_bar(x, mana_bar_y - 10, 32, 4, SKYBLUE, mana_percent)
+
 
 class Thief(Character):
     def compute_damages(self, roll, target: Character):
         self._logger(f"Bonus: Sneacky attack (+{target.get_defense_value()} damages)")
         return super().compute_damages(roll, target) + target.get_defense_value()
 
+
 class Majora(Character):
-  def compute_damages(self, roll, target: Character):
-    print(f"Bonus: if you're wearing Majora's mask, you're entitled to (+5 damages)")
-    return super().compute_damages(roll, target) + 5
+    def compute_damages(self, roll, target: Character):
+        self._logger(f"Bonus: if you're wearing Majora's mask, you're entitled to (+5 damages)")
+        return super().compute_damages(roll, target) + 5
+
 
 list_boss = [Warrior, Mage, Thief, Majora]

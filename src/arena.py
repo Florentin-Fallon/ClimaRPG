@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import random
+
 from pyray import *
 from character import Character
 
@@ -23,6 +26,7 @@ class Arena:
     def __init__(self):
         self._characters: list[Character] = []
         self._logs: list[ArenaLog] = []
+        self._character_counter = 0
 
         self.system_log('Battle started')
 
@@ -46,8 +50,18 @@ class Arena:
         self.log(text, SKYBLUE)
 
     def tick(self):
-        self._characters[0].attack(self._characters[1])
-        self._characters[1].attack(self._characters[0])
+        c = self._characters[self._character_counter]
+        self._character_counter += 1
+
+        if self._character_counter >= len(self._characters):
+            self._character_counter = 0
+
+        for i in range(0, 10):
+            target = self._characters[random.randint(0, len(self._characters) - 1)]
+            if target == c:
+                continue
+
+            c.attack(target)
 
     def update(self):
         pass

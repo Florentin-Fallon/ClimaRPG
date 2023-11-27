@@ -19,11 +19,11 @@ def logger_callback(message, color: Color = WHITE):
 def setup_characters():
     arena.add(Mage('Frank', 20, 10, 15, Dice(2), 10, logger_callback)
               .with_position(Vector2(16, 14)))
-    arena.add(Warrior('Claude', 20, 15, 10, Dice(2), 0, logger_callback)
+    arena.add(Warrior('Claude', 20, 15, 10, Dice(2), logger_callback)
               .with_position(Vector2(22, 14)))
-    arena.add(Majora('Legend', 50, 25, 20, Dice(2), 0, logger_callback)
+    arena.add(Majora('Legend', 50, 25, 20, Dice(2), logger_callback)
               .with_position(Vector2(16, 18)))
-    arena.add(Thief('garro',15,9,20,Dice(2),0, logger_callback)
+    arena.add(Thief('Garro',15,9,20,Dice(2), logger_callback)
               .with_position(Vector2(22,18)))
 
 def main():
