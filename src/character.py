@@ -7,7 +7,7 @@ from texture_cache import load_cached_texture
 
 class Character:
 
-    def __init__(self, name: str, max_hp: int, attack: int, defense: int, dice: Dice, max_mana: int):
+    def __init__(self, name: str, max_hp: int, attack: int, defense: int, dice: Dice, max_mana: int, logger_callback):
         self._name = name
         self._max_hp = max_hp
         self._current_hp = max_hp
@@ -16,6 +16,7 @@ class Character:
         self._dice = dice
         self._max_mana = max_mana
         self._current_mana = max_mana
+        self._logger = logger_callback
         self._position = Vector2(0, 0)
         self._texture = load_cached_texture(f"res/characters/{self.get_id()}.png")
         self._shadow = load_cached_texture(f"res/characters/shadow.png")
@@ -26,6 +27,9 @@ class Character:
     ■ attack: {self._attack_value} 
     ■ defense: {self._defense_value}
     ■ mana : {self._current_mana}"""
+
+    def is_dead(self):
+        return self._current_hp <= 0
 
     def get_position(self):
         return self._position
@@ -45,20 +49,17 @@ class Character:
     def is_alive(self):
         return self._current_hp > 0
 
-    def show_healthbar(self):
-        missing_hp = self._max_hp - self._current_hp
-        healthbar = f"[{"♥" * self._current_hp}{"♡" * missing_hp}] {self._current_hp}/{self._max_hp}hp"
-        print(healthbar)
-
     def regenerate(self):
         self._current_hp = self._max_hp
 
     def decrease_health(self, amount):
-        if amount > 0:
-            self._current_hp -= amount
-            if self._current_hp < 0:
-                self._current_hp = 0
-        self.show_healthbar()
+        if amount <= 0:
+            return
+
+        self._current_hp -= amount
+        if self._current_hp < 0:
+            self._current_hp = 0
+            self._logger(f"{self._name} is dead !", RED)
 
     def compute_damages(self, roll, target):
         return self._attack_value + roll
@@ -68,8 +69,8 @@ class Character:
             return
         roll = self._dice.roll()
         damages = self.compute_damages(roll, target)
-        print(
-            f"⚔️ {self._name} attack {target.get_name()} with {damages} damages (attack: {self._attack_value} + roll: {roll})")
+        self._logger(
+            f"{self._name} attacks {target.get_name()} ! -{damages} HP (attack: {self._attack_value} + roll: {roll})")
         target.defense(damages, self)
 
     def compute_defense(self, damages, roll, attacker):
@@ -78,8 +79,6 @@ class Character:
     def defense(self, damages, attacker: Character):
         roll = self._dice.roll()
         wounds = self.compute_defense(damages, roll, attacker)
-        print(
-            f"🛡️ {self._name} take {wounds} wounds from {attacker.get_name()} (damages: {damages} - defense: {self._defense_value} - roll: {roll})")
         self.decrease_health(wounds)
 
     def with_position(self, position: Vector2) -> Character:
@@ -102,6 +101,11 @@ class Character:
 
         self.render_hud(x, y)
 
+    def render_bar(self, x: int, y: int, width: int, height: int, color: Color, value: float):
+        draw_rectangle(x + 1, y + 1, width, height, BLACK)
+        draw_rectangle(x, y, width, height, BLACK)
+        draw_rectangle(x, y, int(width * value), 4, color)
+
     def render_hud(self, x: int, y: int):
         # Character's name
         text_y = y - 20
@@ -111,9 +115,7 @@ class Character:
         # Character's HP bar
         hp_bar_y = text_y + 12
         hp_percent = self._current_hp / self._max_hp
-        draw_rectangle(x + 1, hp_bar_y + 1, 32, 4, BLACK)
-        draw_rectangle(x, hp_bar_y, 32, 4, BLACK)
-        draw_rectangle(x, hp_bar_y, int(32 * hp_percent), 4, RED)
+        self.render_bar(x, hp_bar_y, 32, 4, RED, hp_percent)
 
 
 class Warrior(Character):
@@ -129,14 +131,14 @@ class Mage(Character):
             self._current_mana -= cost
             return True
         else:
-            print("not enough mana !")
+            self._logger("not enough mana !")
             return False
 
     def regain_mana(self, amount: int):
         self._current_mana = min(self._max_mana, self._current_mana + amount)
 
     def compute_defense(self, damages, roll, attacker: Character):
-        print("🧙 Bonus: Magic armor (-3 damages)")
+        self._logger("🧙 Bonus: Magic armor (-3 damages)")
         if self.use_mana(3):
             return super().compute_defense(damages, roll, attacker) - 3
         else:
@@ -149,21 +151,26 @@ class Mage(Character):
         if self.use_mana(spell_cost):
             roll = self._dice.roll()
             damages = self.compute_damages(roll, target)
-            print(
-                f"🔮 {self._name} casts a spell on {target.get_name()} dealing {damages} damages (attack: {self._attack_value} + roll: {roll})")
+            self._logger(
+                f"{self._name} casts a spell on {target.get_name()} dealing {damages} damages (attack: {self._attack_value} + roll: {roll})")
             target.defense(damages, self)
         else:
-            print("not enough mana to cast the spell")
-            print(f"■ mana : {self._current_mana}")
+            self._logger(f"not enough mana to cast the spell ({self._current_mana} mana)")
 
     def show_healthbar(self):
         super().show_healthbar()
-        print(f"mana = {self._current_mana}")
+        self._logger(f"mana = {self._current_mana}")
 
+    def render_hud(self, x: int, y: int):
+        super().render_hud(x, y - 10)
+
+        mana_bar_y = y
+        mana_percent = self._current_mana / self._max_mana
+        self.render_bar(x, mana_bar_y - 10, 32, 4, SKYBLUE, mana_percent)
 
 class Thief(Character):
     def compute_damages(self, roll, target: Character):
-        print(f"🔪 Bonus: Sneacky attack (+{target.get_defense_value()} damages)")
+        self._logger(f"Bonus: Sneacky attack (+{target.get_defense_value()} damages)")
         return super().compute_damages(roll, target) + target.get_defense_value()
 
 
