@@ -1,7 +1,7 @@
 import pytmx
 from pyray import *
 from arena import Arena
-from character import Mage, Warrior, Majora, Thief
+from character import Mage, Warrior, Majora, Thief, Archer, Deadpool
 from dice import Dice
 from map_renderer import MapRenderer
 from rendering import Raylib
@@ -23,8 +23,13 @@ def setup_characters():
               .with_position(Vector2(22, 14)))
     arena.add(Majora('Legend', 50, 25, 20, Dice(2), logger_callback)
               .with_position(Vector2(16, 18)))
-    arena.add(Thief('Garro',15,9,20,Dice(2), logger_callback)
-              .with_position(Vector2(22,18)))
+    arena.add(Thief('Garro', 15, 9, 20, Dice(2), logger_callback)
+              .with_position(Vector2(22, 18)))
+    arena.add(Archer('Trevize', 50, 15, 20, Dice(2), logger_callback)
+              .with_position(Vector2(16, 23)))
+    arena.add(Deadpool('Ryan', 50, 20, 20, Dice(2), logger_callback)
+              .with_position(Vector2(22, 23)))
+
 
 def main():
     setup_characters()

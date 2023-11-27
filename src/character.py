@@ -174,5 +174,14 @@ class Majora(Character):
         self._logger(f"Bonus: if you're wearing Majora's mask, you're entitled to (+5 damages)")
         return super().compute_damages(roll, target) + 5
 
+class Archer(Character):
+  def compute_damages(self, roll, target: Character):
+    self._logger("Bonus: shoots an arrow (+4 damages)")
+    return super().compute_damages(roll, target) + 4
 
-list_boss = [Warrior, Mage, Thief, Majora]
+class Deadpool(Character):
+  def compute_defense(self, damages, roll, attacker: Character):
+    self._logger("Bonus: shield activate (-5 damages")
+    return super().compute_defense(damages, roll, attacker) - 5
+
+list_boss = [Warrior, Mage, Thief, Majora, Archer, Deadpool]
