@@ -1,7 +1,7 @@
 import pytmx
 from pyray import *
 from arena import Arena
-from character import Mage, Warrior
+from character import Mage, Warrior, Majora, Thief
 from dice import Dice
 from map_renderer import MapRenderer
 from rendering import Raylib
@@ -18,10 +18,13 @@ def logger_callback(message, color: Color = WHITE):
 
 def setup_characters():
     arena.add(Mage('Frank', 20, 10, 15, Dice(2), 10, logger_callback)
-              .with_position(Vector2(16, 15)))
+              .with_position(Vector2(16, 14)))
     arena.add(Warrior('Claude', 20, 15, 10, Dice(2), 0, logger_callback)
-              .with_position(Vector2(22, 15)))
-
+              .with_position(Vector2(22, 14)))
+    arena.add(Majora('Legend', 50, 25, 20, Dice(2), 0, logger_callback)
+              .with_position(Vector2(16, 18)))
+    arena.add(Thief('garro',15,9,20,Dice(2),0, logger_callback)
+              .with_position(Vector2(22,18)))
 
 def main():
     setup_characters()
