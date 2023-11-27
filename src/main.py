@@ -25,7 +25,8 @@ def main():
 
 
 def update():
-    pass
+    for character in arena.get_characters():
+        character.update()
 
 
 def render():

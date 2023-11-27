@@ -19,6 +19,7 @@ class Character:
         self._position = Vector2(0, 0)
         self._texture = load_cached_texture(f"res/characters/{self.get_id()}.png")
         self._shadow = load_cached_texture(f"res/characters/shadow.png")
+        self._yOffset = 0
 
     def __str__(self):
         return f"""{self._name} the Character enter the arena with :
@@ -85,14 +86,34 @@ class Character:
         self._position = position
         return self
 
+    def update(self):
+        self._yOffset += get_frame_time() * 8
+
+        if self._yOffset > 10:
+            self._yOffset = 0
+
     # Raylib specific methods
     def render(self, tile_size: int):
         x = int(self._position.x * tile_size)
         y = int(self._position.y * tile_size)
 
         draw_texture(self._shadow, x, y + 5, WHITE)
+        draw_texture(self._texture, x, y - int(self._yOffset / 5), WHITE)
 
-        draw_texture(self._texture, x, y, WHITE)
+        self.render_hud(x, y)
+
+    def render_hud(self, x: int, y: int):
+        # Character's name
+        text_y = y - 20
+        draw_text(self._name, x + 1, text_y + 1, 10, BLACK)
+        draw_text(self._name, x, text_y, 10, WHITE)
+
+        # Character's HP bar
+        hp_bar_y = text_y + 12
+        hp_percent = self._current_hp / self._max_hp
+        draw_rectangle(x + 1, hp_bar_y + 1, 32, 4, BLACK)
+        draw_rectangle(x, hp_bar_y, 32, 4, BLACK)
+        draw_rectangle(x, hp_bar_y, int(32 * hp_percent), 4, RED)
 
 
 class Warrior(Character):
