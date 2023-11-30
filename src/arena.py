@@ -4,6 +4,7 @@ import random
 
 from pyray import *
 from character import Character
+from dice import Dice
 
 
 class ArenaLog:
@@ -28,6 +29,10 @@ class Arena:
         self._logs: list[ArenaLog] = []
         self._character_counter = 0
         self._running = False
+        self._do_turn_hint = load_texture('res/ui/do_turn_hint.png')
+        self._do_turn_hint_p = load_texture('res/ui/do_turn_hint_pressed.png')
+        self._vignette = load_texture('res/ui/vignette.png')
+        self._dice = Dice(12)
 
     def is_battle(self):
         return self._running
@@ -58,6 +63,7 @@ class Arena:
         self._running = True
         self.system_log('Battle started')
         self.system_log(f"First turn is for {self._characters[0].get_name()}")
+        self._dice = self._characters[0].get_dice()
 
     def add(self, character: Character):
         self._characters += [character]
@@ -82,6 +88,9 @@ class Arena:
             if ch.is_alive():
                 opponents += [ch]
 
+        if self._character_counter >= len(opponents):
+            self._character_counter = 0
+
         c = opponents[self._character_counter]
         self._character_counter += 1
 
@@ -96,9 +105,13 @@ class Arena:
             self._character_counter = 0
 
         target = None
+        other_opponents = []
+        for opponent in opponents:
+            if opponent != c:
+                other_opponents += [opponent]
 
         for i in range(0, 10):
-            target = opponents[random.randint(0, len(opponents) - 1)]
+            target = other_opponents[random.randint(0, len(other_opponents) - 1)]
             if target == c:
                 continue
 
@@ -108,14 +121,21 @@ class Arena:
             c.attack(target)
 
         self.system_log(f"Next turn is for {opponents[self._character_counter].get_name()}")
+        self._dice = opponents[self._character_counter].get_dice()
 
     def update(self):
         pass
 
     def render(self):
-        latest_logs = self._logs[-15:]
+        draw_texture(self._vignette, 0, 0, WHITE)
 
+        latest_logs = self._logs[-15:]
         for i, log in enumerate(latest_logs):
             log.draw(20, 20 + i * 12)
 
-        pass
+        hint_x: int = 640 / 2 - self._do_turn_hint.width / 2
+        hint_y: int = 420
+        draw_texture(self._do_turn_hint_p if is_key_down(KeyboardKey.KEY_SPACE) else self._do_turn_hint,
+                     int(hint_x), int(hint_y), WHITE)
+
+        self._dice.draw(640 - 40, 480 - 40)

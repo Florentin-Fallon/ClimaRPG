@@ -29,6 +29,9 @@ class Character:
     def log_bonus(self, name: str):
         self._logger(f"{self._name} used {name} !", GREEN)
 
+    def get_dice(self) -> Dice:
+        return self._dice
+
     def get_position(self):
         return self._position
 
@@ -109,15 +112,17 @@ class Character:
         self.render_hud(x, y)
 
     def render_bar(self, x: int, y: int, width: int, height: int, color: Color, value: float):
-        draw_rectangle(x + 1, y + 1, width, height, BLACK)
+        draw_rectangle(x, y, width+2, height+2, BLACK)
         draw_rectangle(x, y, width, height, BLACK)
         draw_rectangle(x, y, int(width * value), 4, color)
+        draw_rectangle_lines_ex(Rectangle(x-1, y-1, width+2, height+2), 1, WHITE)
 
     def render_hud(self, x: int, y: int):
         # Character's name
         text_y = y - 20
-        draw_text(self._name, x + 1, text_y + 1, 10, BLACK)
-        draw_text(self._name, x, text_y, 10, WHITE)
+        draw_text(self._dice.__str__(), x - 1, text_y - 10, 10, WHITE)
+        draw_text(self._name, x, text_y + 1, 10, BLACK)
+        draw_text(self._name, x - 1, text_y, 10, WHITE)
 
         # Character's HP bar
         hp_bar_y = text_y + 12

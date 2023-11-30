@@ -1,16 +1,24 @@
 import random
 
+from pyray import *
+
+from texture_cache import load_cached_texture
+
 
 class Dice:
     def __init__(self, faces=6):
         self._faces = faces
+        self._texture = load_cached_texture(f'res/ui/dices/d{faces}.png')
+        self._name = f"D{faces}"
 
     def __str__(self):
-        return f"I'm a {self._faces} faces dice"
+        return self._name
 
     def roll(self):
         return random.randint(1, self._faces)
 
+    def draw(self, x: int, y: int):
+        draw_texture(self._texture, x, y, WHITE)
 
 class RiggedDice(Dice):
 

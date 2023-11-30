@@ -6,8 +6,8 @@ from dice import Dice
 from map_renderer import MapRenderer
 from rendering import Raylib
 
+raylib = Raylib(fps=30)
 arena = Arena()
-raylib = Raylib()
 rend = MapRenderer(pytmx.TiledMap('res/maps/map.tmx'), 16)
 camera = Camera2D(Vector2(0, 0), Vector2(0, 0), 0, 1)
 
@@ -17,17 +17,17 @@ def logger_callback(message, color: Color = WHITE):
 
 
 def setup_characters():
-    arena.add(Mage('Frank', 50, 10, 15, Dice(10), 10, logger_callback)
+    arena.add(Mage('Frank', 50, 10, 15, Dice(12), 10, logger_callback)
               .with_position(Vector2(16, 14)))
-    arena.add(Warrior('Claude', 50, 15, 10, Dice(10), logger_callback)
+    arena.add(Warrior('Claude', 50, 15, 10, Dice(6), logger_callback)
               .with_position(Vector2(22, 14)))
-    arena.add(Majora('Legend', 50, 25, 20, Dice(10), logger_callback)
+    arena.add(Majora('Legend', 50, 25, 20, Dice(4), logger_callback)
               .with_position(Vector2(16, 18)))
-    arena.add(Thief('Garro', 15, 9, 20, Dice(10), logger_callback)
+    arena.add(Thief('Garro', 15, 9, 20, Dice(4), logger_callback)
               .with_position(Vector2(22, 18)))
-    arena.add(Archer('Trevize', 50, 15, 20, Dice(10), logger_callback)
+    arena.add(Archer('Trevize', 50, 15, 20, Dice(6), logger_callback)
               .with_position(Vector2(16, 23)))
-    arena.add(Deadpool('Ryan', 50, 20, 20, Dice(10), logger_callback)
+    arena.add(Deadpool('Ryan', 50, 20, 20, Dice(20), logger_callback)
               .with_position(Vector2(22, 23)))
 
     arena.start_battle()

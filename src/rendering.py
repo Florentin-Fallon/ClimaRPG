@@ -4,12 +4,14 @@ import pytmx
 
 class Raylib:
 
-    def __init__(self):
+    def __init__(self, fps: int):
         set_config_flags(ConfigFlags.FLAG_WINDOW_RESIZABLE)
         init_window(640, 480, 'Clima RPG')
         self.width = 640
         self.height = 480
         self.render_texture: RenderTexture = load_render_texture(self.width, self.height)
+
+        set_target_fps(fps)
 
     def run(self, render, update):
         while not window_should_close():
