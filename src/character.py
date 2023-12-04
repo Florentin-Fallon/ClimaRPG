@@ -20,6 +20,7 @@ class Character:
         self._position = Vector2(0, 0)
         self._texture = load_cached_texture(f"res/characters/{self.get_id()}.png")
         self._shadow = load_cached_texture(f"res/characters/shadow.png")
+        self._shadow_light = load_cached_texture(f"res/characters/shadow_light.png")
         self._yOffset = 0
         self._tilt: float = 0
 
@@ -104,19 +105,19 @@ class Character:
 
     def update_movements(self):
         if is_key_down(KeyboardKey.KEY_W):
-            self._position.y -= get_frame_time()
+            self._position.y -= get_frame_time() * (3 if is_key_down(KeyboardKey.KEY_LEFT_SHIFT) else 1)
         if is_key_down(KeyboardKey.KEY_S):
-            self._position.y += get_frame_time()
+            self._position.y += get_frame_time() * (3 if is_key_down(KeyboardKey.KEY_LEFT_SHIFT) else 1)
         if is_key_down(KeyboardKey.KEY_A):
-            self._position.x -= get_frame_time()
+            self._position.x -= get_frame_time() * (3 if is_key_down(KeyboardKey.KEY_LEFT_SHIFT) else 1)
         if is_key_down(KeyboardKey.KEY_D):
-            self._position.x += get_frame_time()
+            self._position.x += get_frame_time() * (3 if is_key_down(KeyboardKey.KEY_LEFT_SHIFT) else 1)
 
-    def render(self, tile_size: int):
+    def render(self, tile_size: int, selected: bool):
         x = int(self._position.x * tile_size)
         y = int(self._position.y * tile_size)
 
-        draw_texture(self._shadow, x, y + 5, WHITE)
+        draw_texture(self._shadow if not selected else self._shadow_light, x, y + 5, WHITE)
         draw_texture_ex(self._texture, Vector2(x + self._tilt * self._texture.width,
                                                y - int(self._yOffset / 5)), self._tilt * 90, 1, WHITE)
 

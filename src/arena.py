@@ -36,6 +36,9 @@ class Arena:
         self._vignette = load_texture('res/ui/vignette.png')
         self._dice = Dice(12)
 
+    def get_current_character(self):
+        return self.current_characters
+
     def is_battle(self):
         return self._running
 
@@ -66,6 +69,7 @@ class Arena:
         self.system_log('Battle started')
         self.system_log(f"First turn is for {self._characters[0].get_name()}")
         self._dice = self._characters[0].get_dice()
+        self.current_characters = self._characters[0]
 
     def add(self, character: Character):
         self._characters += [character]
@@ -129,7 +133,7 @@ class Arena:
         if self.current_characters is not None:
             self.current_characters.update_movements()
 
-        if is_key_pressed(KeyboardKey.KEY_LEFT_SHIFT) or is_key_pressed(KeyboardKey.KEY_RIGHT_SHIFT):
+        if is_key_pressed(KeyboardKey.KEY_TAB):
             self.current_character_index = (self.current_character_index + 1) % len(self._characters)
             self.current_characters = self._characters[self.current_character_index]
 

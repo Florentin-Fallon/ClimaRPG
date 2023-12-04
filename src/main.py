@@ -63,7 +63,7 @@ def render():
 
     # Render the characters
     for character in arena.get_characters():
-        character.render(rend.get_tile_size())
+        character.render(rend.get_tile_size(), character == arena.get_current_character())
 
     arena.render()
 
