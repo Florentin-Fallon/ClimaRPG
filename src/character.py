@@ -100,7 +100,18 @@ class Character:
         if self.is_dead() and self._tilt < 1:
             self._tilt += get_frame_time() * 4
 
-    # Raylib specific methods
+        current_character_index = 0
+
+    def update_movements(self):
+        if is_key_down(KeyboardKey.KEY_W):
+            self._position.y -= get_frame_time()
+        if is_key_down(KeyboardKey.KEY_S):
+            self._position.y += get_frame_time()
+        if is_key_down(KeyboardKey.KEY_A):
+            self._position.x -= get_frame_time()
+        if is_key_down(KeyboardKey.KEY_D):
+            self._position.x += get_frame_time()
+
     def render(self, tile_size: int):
         x = int(self._position.x * tile_size)
         y = int(self._position.y * tile_size)
